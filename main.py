@@ -5,14 +5,13 @@ import csv
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from python-jose import JWTError, jwt
+import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
 SECRET_KEY = "97cb9c96ef00630328826905e90aed5dcb7dd2ccc0363a76f6833cbe6605f711"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
 
 fake_users_db = {
     "johndoe": {
@@ -24,15 +23,12 @@ fake_users_db = {
     }
 }
 
-
 class Token(BaseModel):
     access_token: str
     token_type: str
 
-
 class TokenData(BaseModel):
     username: Optional[str] = None
-
 
 class User(BaseModel):
     username: str
@@ -40,13 +36,11 @@ class User(BaseModel):
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
 
-
 class UserInDB(User):
     hashed_password: str
 
 class Todo(BaseModel):
     description: str
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -105,8 +99,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
+    except jwt.exceptions.DecodeError:
+       raise credentials_exception
+    
     user = get_user(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
@@ -116,6 +111,10 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+@app.get("/")
+def read_root():
+    return {"Content": "Python Test api"}
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
