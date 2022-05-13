@@ -5,7 +5,7 @@ import csv
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from jose import JWTError, jwt
+from python-jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
