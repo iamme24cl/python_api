@@ -6,6 +6,8 @@
 * Install the packages in requrements.txt
 * run command "uvicorn main:app --reload" to start the server
 * Visit base url http://127.0.0.1:8000
+* Visit front end for the app at this url https://codesandbox.io/s/fetch-data-75qrki?file=/src/App.js:492-513 
+* You should now be able to interact with the api while the server at port 8000 is running.
 
 ## Routes
 login => http://127.0.0.1:8000/token
